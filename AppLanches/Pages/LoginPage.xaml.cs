@@ -1,14 +1,17 @@
 using AppLanches.Services;
+using AppLanches.Validations;
 
 namespace AppLanches.Pages;
 
 public partial class LoginPage : ContentPage
 {
     private readonly ApiService _apiService;
-    public LoginPage(ApiService apiService)
+    private readonly IValidator _validator;
+    public LoginPage(ApiService apiService, IValidator validator)
     {
         InitializeComponent();
         _apiService = apiService;
+        _validator = validator;
     }
 
     private async void BtnSignIn_Clicked(object sender, EventArgs e)
@@ -55,6 +58,6 @@ public partial class LoginPage : ContentPage
 
     private async void TapRegister_Tapped(object sender, TappedEventArgs e)
     {
-        await Navigation.PushAsync(new InscricaoPage(_apiService));
+        await Navigation.PushAsync(new InscricaoPage(_apiService, _validator));
     }
 }

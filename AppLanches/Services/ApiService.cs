@@ -13,7 +13,7 @@ namespace AppLanches.Services
     public class ApiService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl = "";
+        private readonly string _baseUrl = "https://pht5ls1r-7066.brs.devtunnels.ms/";
         private readonly ILogger<ApiService> _logger;
         JsonSerializerOptions _serializerOptions;
         public ApiService(HttpClient httpClient, ILogger<ApiService> logger)

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -25,6 +26,74 @@ namespace AppLanches.Services
                 PropertyNameCaseInsensitive = true
             };
 
+        }
+        private async Task<HttpResponseMessage> PostRequest(string uri, HttpContent content)
+        {
+            try
+            {
+                var enderecoUrl = _baseUrl + uri;
+                return await _httpClient.PostAsync(enderecoUrl, content);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Erro ao enviar requisição POST para {uri}:{ex.Message}");
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }
+        }
+        private async Task<(T? Data, string? ErrorMessage)> GetAsync<T>(string endPoint)
+        {
+            try
+            {
+                this.AddAuthorizationHeader();
+                var response = await _httpClient.GetAsync(AppConfig.BaseUrl + endPoint);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var data = JsonSerializer.Deserialize<T>(responseString, _serializerOptions);
+                    return (data ?? Activator.CreateInstance<T>(), null);
+                }
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        string errorMessage = "Unauthorized";
+                        _logger.LogWarning(errorMessage);
+                        return (default, errorMessage);
+                    }
+
+                    string generalErrorMessage = $"Erro na requisição: {response.ReasonPhrase}";
+                    _logger.LogError(generalErrorMessage);
+                    return (default, generalErrorMessage);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                string errorMessage = $"Erro de requisição HTTP: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage); 
+            }
+            catch (JsonException ex)
+            {
+                string errorMessage = $"Erro de desserialização JSON: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage);
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = $"Erro inesperado: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage);
+            }
+        }
+
+        private void AddAuthorizationHeader()
+        {
+            var token = Preferences.Get("Accesstoken", string.Empty);
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
         }
 
         public async Task<ApiResponse<bool>> RegisterUser(string nome, string email, string telefone, string password)
@@ -97,19 +166,14 @@ namespace AppLanches.Services
                 return new ApiResponse<bool> { ErrorMessage = ex.Message };
             }
         }
-
-        private async Task<HttpResponseMessage> PostRequest(string uri, HttpContent content)
+        public async Task<(List<Categoria>? Categorias, string? ErrorMessage)> GetCategorias()
         {
-            try
-            {
-                var enderecoUrl = _baseUrl + uri;
-                return await _httpClient.PostAsync(enderecoUrl, content);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Erro ao enviar requisição POST para {uri}:{ex.Message}");
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
-            }
+            return await GetAsync<List<Categoria>>("api/categoria");
+        }
+        public async Task<(List<Produto>? Produtos, string? ErrorMessage)> GetProdutos(string tipoProduto, string categoriaId)
+        {
+            var endpoint = $"api/Produtos?tipoProduto={tipoProduto}&categoriaId={categoriaId}";
+            return await this.GetAsync<List<Produto>>(endpoint);
         }
     }
 }

@@ -21,7 +21,7 @@ public partial class LoginPage : ContentPage
             var responde = await _apiService.Login(this.EntEmail.Text, this.EntPassword.Text);
             if (!responde.HasError)
             {
-                Application.Current!.MainPage = new AppShell();
+                Application.Current!.MainPage = new AppShell(_apiService, _validator);
             }
             else
                 await DisplayAlert("Atenção", "Algo deu errado", "Ok");

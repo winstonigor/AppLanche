@@ -16,6 +16,7 @@ public partial class HomePage : ContentPage
         _validator = validator;
         _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
         this.lblNomeUsuario.Text = "Olá," + Preferences.Get("usuarionome", string.Empty);
+        this.Title = AppConfig.tituloHomePage;
     }
 
     //Utilizado qiando a pagina está preste a ser exibida
@@ -116,5 +117,16 @@ public partial class HomePage : ContentPage
     {
         _loginPageDisplayed = true;
         await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+    }
+
+    private void CvCategorias_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var categoriaSelecionada = e.CurrentSelection.FirstOrDefault() as Categoria;
+        if (categoriaSelecionada == null) return;
+
+        Navigation.PushAsync(new ListaProdutosPage(categoriaSelecionada.Id, categoriaSelecionada.Nome!, _apiService, _validator));
+
+        ((CollectionView)sender).SelectedItem = null;
+
     }
 }

@@ -6,10 +6,16 @@
     xmlns:local="clr-namespace:AppLanches"
     xmlns:pages="clr-namespace:AppLanches.Pages"
     Shell.FlyoutBehavior="Disabled"
-    Shell.TabBarBackgroundColor="#a90409"
-    Shell.TabBarTitleColor="White"
-    Shell.TabBarUnselectedColor="FloralWhite"
-    Title="AppLanches">
+    Shell.NavBarHasShadow="True"
+    Shell.BackgroundColor="#2196f3"
+    Shell.ForegroundColor="White"
+    Shell.TitleColor="White"
+    Shell.UnselectedColor="White"
+    Shell.DisabledColor="#BFBFBF"
+    Shell.TabBarTitleColor="AntiqueWhite"
+    Shell.TabBarBackgroundColor="#2196f3"
+    Shell.TabBarForegroundColor="White"
+    >
 
     <!--<TabBar>
         <Tab Title="Home" Icon="home">

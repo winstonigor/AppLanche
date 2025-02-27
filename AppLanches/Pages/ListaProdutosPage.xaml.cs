@@ -60,4 +60,16 @@ public partial class ListaProdutosPage : ContentPage
             return Enumerable.Empty<Produto>();
         }
     }
+
+    private void CvProdutos_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var produtoSelecionado = e.CurrentSelection.FirstOrDefault() as Produto;
+
+        if (produtoSelecionado is null)
+            return;
+
+        this.Navigation.PushAsync(new ProdutoDetalhesPage(produtoSelecionado.Id, produtoSelecionado.Nome, _apiService, _validator));
+
+        ((CollectionView)sender).SelectedItem = null;
+    }
 }

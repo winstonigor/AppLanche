@@ -71,7 +71,7 @@ namespace AppLanches.Services
             {
                 string errorMessage = $"Erro de requisição HTTP: {ex.Message}";
                 _logger.LogError(ex, errorMessage);
-                return (default, errorMessage); 
+                return (default, errorMessage);
             }
             catch (JsonException ex)
             {
@@ -174,6 +174,11 @@ namespace AppLanches.Services
         {
             var endpoint = $"api/Produtos?tipoProduto={tipoProduto}&categoriaId={categoriaId}";
             return await this.GetAsync<List<Produto>>(endpoint);
+        }
+        public async Task<(Produto? ProdutoDetalhe, string? ErrorMessage)> GetProdutoDetalhe(int produtoId)
+        {
+            string endpoint = $"api/produtos/{produtoId}";
+            return await this.GetAsync<Produto>(endpoint);
         }
     }
 }

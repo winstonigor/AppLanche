@@ -86,7 +86,6 @@ namespace AppLanches.Services
                 return (default, errorMessage);
             }
         }
-
         private void AddAuthorizationHeader()
         {
             var token = Preferences.Get("Accesstoken", string.Empty);
@@ -95,7 +94,7 @@ namespace AppLanches.Services
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
         }
-
+        
         public async Task<ApiResponse<bool>> RegisterUser(string nome, string email, string telefone, string password)
         {
             try
@@ -179,6 +178,33 @@ namespace AppLanches.Services
         {
             string endpoint = $"api/produtos/{produtoId}";
             return await this.GetAsync<Produto>(endpoint);
+        }
+        public async Task<ApiResponse<bool>> AdicionaItemNoCarrinho(CarrinhoCompra carrinhoCompra)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(carrinhoCompra, _serializerOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await this.PostRequest("api/ItensCarrinhoCompra", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError($"Erro ao enviar requisição HTTP: {response.StatusCode}");
+                    return new ApiResponse<bool> { ErrorMessage = $"Erro ao enviar requisição HTTP: {response.StatusCode}" };
+                }
+
+                return new ApiResponse<bool> { Data = true };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Erro ao adicoinar item no carrinho: {ex.Message}");
+                return new ApiResponse<bool> { ErrorMessage = ex.Message };
+            }
+        }
+        public async Task<(List<CarrinhoCompraItem>? carrinhoCompraItems, string? ErrorMessage)> GetItensCarrinhoCompra(int usuarioId)
+        {
+            var endpoint = $"api/ItensCarrinhoCompra/{usuarioId}";
+            return await this.GetAsync<List<CarrinhoCompraItem>>(endpoint);
         }
     }
 }

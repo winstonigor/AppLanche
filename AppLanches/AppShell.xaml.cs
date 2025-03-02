@@ -20,7 +20,7 @@ namespace AppLanches
         private void ManipulaInterface()
         {
             var homePage = new HomePage(_apiService, _validator);
-            var carrinhoPage = new CarrinhoPage();
+            var carrinhoPage = new CarrinhoPage(_apiService, _validator);
             var favoritoPage = new FavoritosPage();
             var perfilPage = new PerfilPage();
 

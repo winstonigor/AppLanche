@@ -1,6 +1,7 @@
 using AppLanches.Models;
 using AppLanches.Services;
 using AppLanches.Validations;
+using System.Runtime.CompilerServices;
 
 namespace AppLanches.Pages;
 
@@ -72,16 +73,72 @@ public partial class ProdutoDetalhesPage : ContentPage
 
     private void BtnRemover_Clicked(object sender, EventArgs e)
     {
+        if (int.TryParse(this.LblQuantidade.Text, out int quantidade) &&
+            decimal.TryParse(this.LblProdutoPreco.Text, out decimal precoUnitario))
+        {
+            //decrementa a quantidade, e não premite que seja menor que 1
+            quantidade = Math.Max(1, quantidade - 1);
+            this.LblQuantidade.Text = quantidade.ToString();
 
+            //calcula o preço total
+            var precoTotal = quantidade * precoUnitario;
+            this.LblPrecoTotal.Text = precoTotal.ToString();
+        }
+        else
+        {
+            DisplayAlert("Erro", "Valores Inválidos", "OK");
+        }
     }
 
     private void BtnAdicionar_Clicked(object sender, EventArgs e)
     {
+        if(int.TryParse(this.LblQuantidade.Text, out int quantidade) &&
+            decimal.TryParse(this.LblProdutoPreco.Text, out decimal precoUnitario))
+        {
+            //incrementa quantidade
+            quantidade++;
+            this.LblQuantidade.Text = quantidade.ToString();
 
+            //calcula o preco total
+            var precoTotal = quantidade * precoUnitario;
+            this.LblPrecoTotal.Text = precoTotal.ToString();
+        }
+        else
+        {
+            //error
+            this.DisplayAlert("Erro", "Valores Inválidos", "OK");
+        }
     }
 
-    private void BtnIncluirNoCarrinho_Clicked(object sender, EventArgs e)
+    private async void BtnIncluirNoCarrinho_Clicked(object sender, EventArgs e)
     {
+        try
+        {
+            var carrinhoCompra = new CarrinhoCompra()
+            {
+                Quantidade = Convert.ToInt32(this.LblQuantidade.Text),
+                PrecoUnitario = Convert.ToDecimal(this.LblProdutoPreco.Text),
+                ValorTotal = Convert.ToDecimal(this.LblPrecoTotal.Text),
+                ProdutoId = _produtoId,
+                ClienteId = Preferences.Get("usuarioid", 0)
+            };
 
+            var response = await _apiService.AdicionaItemNoCarrinho(carrinhoCompra);
+            if (response.Data)
+            {
+                await this.DisplayAlert("Sucesso", "Item adicionado ao carrinho!", "OK");
+                
+                //volta uma pagina (pagina anterior)
+                await this.Navigation.PopAsync();
+            }
+            else
+            {
+                await this.DisplayAlert("Erro", $"Falha ao adicoinar item: {response.ErrorMessage}", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await this.DisplayAlert("Erro", $"Ocorreu um erro: {ex.Message}", "OK");
+        }
     }
 }

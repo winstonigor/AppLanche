@@ -29,8 +29,7 @@
 
         <Label Grid.Row="3" Text="Mais Vendidos" FontSize="Medium" TextColor="#a90409" FontAttributes="Bold" VerticalOptions="Center"></Label>
 
-        <CollectionView x:Name="CvMaisVendidos" Grid.Row="4" SelectionMode="Single">
-            
+        <CollectionView x:Name="CvMaisVendidos" Grid.Row="4" SelectionMode="Single" SelectionChanged="CvMaisVendidos_SelectionChanged">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10"></LinearItemsLayout>
             </CollectionView.ItemsLayout>
@@ -50,7 +49,7 @@
 
         <Label Grid.Row="5" Text="Mais Populares" FontSize="Medium" TextColor="#a90409" FontAttributes="Bold" VerticalOptions="Center"></Label>
 
-        <CollectionView x:Name="CvPopulares" Grid.Row="6" SelectionMode="Single">
+        <CollectionView x:Name="CvPopulares" Grid.Row="6" SelectionMode="Single" SelectionChanged="CvPopulares_SelectionChanged">
 
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10"></LinearItemsLayout>

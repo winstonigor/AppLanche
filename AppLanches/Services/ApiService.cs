@@ -1,4 +1,5 @@
 ﻿using AppLanches.Models;
+using AppLanches.Pages;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -86,6 +87,21 @@ namespace AppLanches.Services
                 return (default, errorMessage);
             }
         }
+        private async Task<HttpResponseMessage> PutRequest(string uri, HttpContent content)
+        {
+            try
+            {
+                var endrecoUrl = AppConfig.BaseUrl + uri;
+                this.AddAuthorizationHeader();
+                var result = await _httpClient.PutAsync(endrecoUrl, content);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Erro ao enviar requisição PUT para {uri}:{ex.Message}");
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }
+        }
         private void AddAuthorizationHeader()
         {
             var token = Preferences.Get("Accesstoken", string.Empty);
@@ -94,7 +110,7 @@ namespace AppLanches.Services
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
         }
-        
+
         public async Task<ApiResponse<bool>> RegisterUser(string nome, string email, string telefone, string password)
         {
             try
@@ -206,5 +222,66 @@ namespace AppLanches.Services
             var endpoint = $"api/ItensCarrinhoCompra/{usuarioId}";
             return await this.GetAsync<List<CarrinhoCompraItem>>(endpoint);
         }
+        public async Task<(bool Data, string? ErrorMessage)> AtualizaQuantidadeItemCarrinho(int produtoId, string acao)
+        {
+            try
+            {
+                var content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
+                var response = await this.PutRequest($"api/ItensCarrinhoCompra?produtoId={produtoId}&acao={acao}", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, null);
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        string errorMessage = "Unauthorized";
+                        _logger.LogWarning(errorMessage);
+                        return (false, errorMessage);
+                    }
+
+                    string generalErrorMessage = $"Erro na requisição: {response.ReasonPhrase}";
+                    _logger.LogError(generalErrorMessage);
+                    return (false, generalErrorMessage);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                var errorMessage = $"Erro de requisição HTTP: {ex.Message}";
+                _logger.LogError(errorMessage);
+                return (false, errorMessage);
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = $"Erro inesperado: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (false, errorMessage);
+            }
+        }
+
+        public async Task<ApiResponse<bool>> ConfirmarPedido(Pedido pedido)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(pedido, _serializerOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await this.PostRequest("api/Pedidos", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorMessage = response.StatusCode == HttpStatusCode.Unauthorized
+                        ? "Unauthrized"
+                        : $"Erro ao enviar requisição HTTP: {response.StatusCode}";
+
+                    _logger.LogError($"Erro ao enviar requisição HTTP: {response.StatusCode}");
+                    return new ApiResponse<bool> { ErrorMessage = errorMessage };
+                }
+                return new ApiResponse<bool> { Data = true };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Erro ao confirmar pedido: {ex.Message}");
+                return new ApiResponse<bool> { ErrorMessage = ex.Message };
+            }
+        }
+
     }
 }

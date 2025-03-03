@@ -19,11 +19,11 @@
                             <Label Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" FontSize="Subtitle" HorizontalOptions="Start" VerticalOptions="Center" FontAttributes="Bold" Text="{Binding ProdutoNome}"></Label>
                             <Label Grid.Row="1" Grid.Column="1" HorizontalOptions="Start" VerticalOptions="Center" FontAttributes="Bold" Text="{Binding Preco, StringFormat='R$ {0:F2}'}"></Label>
                             <HorizontalStackLayout Grid.Row="2" Grid.Column="1" Spacing="10">
-                                <Button x:Name="BtnDecrementar" HeightRequest="25" WidthRequest="25" CornerRadius="8" BackgroundColor="White" TextColor="Black" BorderWidth="1" Text="-" Padding="0" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"></Button>
+                                <Button x:Name="BtnDecrementar" HeightRequest="25" WidthRequest="25" CornerRadius="8" BackgroundColor="White" TextColor="Black" BorderWidth="1" Text="-" Padding="0" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" Clicked="BtnDecrementar_Clicked"></Button>
                                 <Label x:Name="LblQuantidade" TextColor="#80574d" FontAttributes="Bold" VerticalTextAlignment="Center" Text="{Binding Quantidade}"></Label>
-                                <Button x:Name="BtnIncrementar" HeightRequest="25" WidthRequest="25" CornerRadius="8" BackgroundColor="#18565f" Text="+" Padding="0" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"></Button>
+                                <Button x:Name="BtnIncrementar" HeightRequest="25" WidthRequest="25" CornerRadius="8" BackgroundColor="#18565f" Text="+" Padding="0" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" Clicked="BtnIncrementar_Clicked"></Button>
                             </HorizontalStackLayout>
-                            <ImageButton x:Name="BtnDeletar" Grid.Row="2" Grid.Column="2" HeightRequest="25" WidthRequest="25" Source="delete" Padding="0" HorizontalOptions="Center" VerticalOptions="Center"></ImageButton>
+                            <ImageButton x:Name="BtnDeletar" Grid.Row="2" Grid.Column="2" HeightRequest="25" WidthRequest="25" Source="delete" Padding="0" HorizontalOptions="Center" VerticalOptions="Center" Clicked="BtnDeletar_Clicked"></ImageButton>
                         </Grid>
                     </Frame>
                 </DataTemplate>
@@ -32,7 +32,7 @@
         <Frame Grid.Row="2" Padding="10" BackgroundColor="White" BorderColor="White">
             <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="8*, 2*">
                 <Label Grid.Row="0" Grid.Column="0" Text="Endereço de Entrega" FontAttributes="Bold" VerticalOptions="Start"></Label>
-                <ImageButton x:Name="BtnEditaEndereco" Grid.Row="0" Padding="0" HeightRequest="25" WidthRequest="25" Grid.Column="1" HorizontalOptions="End" VerticalOptions="Start" Source="edit"></ImageButton>
+                <ImageButton x:Name="BtnEditaEndereco" Grid.Row="0" Padding="0" HeightRequest="25" WidthRequest="25" Grid.Column="1" HorizontalOptions="End" VerticalOptions="Start" Source="edit" Clicked="BtnEditaEndereco_Clicked"></ImageButton>
                 <Label x:Name="LblEndereco" Grid.Row="1" Grid.Column="0"></Label>
             </Grid>
         </Frame>
@@ -49,10 +49,10 @@
                 </Label>
                 <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" Margin="0,0,10,0" Grid.RowSpan="2" Grid.Column="1" Spacing="2">
                     <Label Text="confirmar Pedido " Padding="0" VerticalOptions="Center" BackgroundColor="#18565f" FontAttributes="Bold" TextColor="White"></Label>
-                    <Image Source="reghtarrow" HeightRequest="25" WidthRequest="25" VerticalOptions="Center"></Image>
+                    <Image Source="rightarrow" HeightRequest="25" WidthRequest="25" VerticalOptions="Center"></Image>
 
                     <HorizontalStackLayout.GestureRecognizers>
-                        <TapGestureRecognizer x:Name="TapConfirmarPedido"></TapGestureRecognizer>
+                        <TapGestureRecognizer x:Name="TapConfirmarPedido" Tapped="TapConfirmarPedido_Tapped"></TapGestureRecognizer>
                     </HorizontalStackLayout.GestureRecognizers>
                 </HorizontalStackLayout>
             </Grid>

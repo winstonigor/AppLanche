@@ -9,6 +9,7 @@ public partial class HomePage : ContentPage
     private readonly ApiService _apiService;
     private readonly IValidator _validator;
     private bool _loginPageDisplayed = false;
+    private bool _dadosCarregado = false;
 
     public HomePage(ApiService apiService, IValidator validator)
     {
@@ -19,13 +20,24 @@ public partial class HomePage : ContentPage
         this.Title = AppConfig.tituloHomePage;
     }
 
-    //Utilizado qiando a pagina está preste a ser exibida
+    //Utilizado quando a pagina está preste a ser exibida
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await this.GetListaCategorias();
-        await this.GetMaisVendidos();
-        await this.GetPopulares();
+        if (!_dadosCarregado)
+        {
+            await this.CarregaDadados();
+            this._dadosCarregado = true;
+        }
+    }
+
+    private async Task CarregaDadados()
+    {
+        var categoriasTask = this.GetListaCategorias();
+        var maisVendicosTask = this.GetMaisVendidos();
+        var popularesTask = this.GetPopulares();
+
+        await Task.WhenAll(categoriasTask, maisVendicosTask, popularesTask);
     }
 
     private async Task<IEnumerable<Produto>> GetPopulares()
@@ -138,7 +150,7 @@ public partial class HomePage : ContentPage
 
     private void CvMaisVendidos_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if(sender is CollectionView collectionView)
+        if (sender is CollectionView collectionView)
             this.NavigateToProdutoDetalhesPage(collectionView, e);
     }
 
